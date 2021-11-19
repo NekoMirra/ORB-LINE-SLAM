@@ -1,0 +1,2 @@
+Vocabulary/ORBvoc.txt filter=lfs diff=lfs merge=lfs -text
+Vocabulary/LSDvoc.txt filter=lfs diff=lfs merge=lfs -text
