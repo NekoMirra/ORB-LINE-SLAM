@@ -51,6 +51,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/adaptive_feature_example.dir/DependInfo.cmake"
   "CMakeFiles/line_graph_example.dir/DependInfo.cmake"
   "CMakeFiles/linedesc.dir/DependInfo.cmake"
   "CMakeFiles/linedesc_includes.dir/DependInfo.cmake"

@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/LineGraphModel.h
+vector
+-
+map
+-
+set
+-
+cmath
+-
+opencv2/core.hpp
+-
+NFA.h
+../include/NFA.h
+
+../include/NFA.h
+
+/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/src/adaptive_feature_example.cpp
+LineGraphModel.h
+/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/src/LineGraphModel.h
+opencv2/opencv.hpp
+-
+opencv2/features2d.hpp
+-
+iostream
+-
+

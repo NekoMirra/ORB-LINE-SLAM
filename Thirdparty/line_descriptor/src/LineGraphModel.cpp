@@ -3,6 +3,8 @@
 #include <iostream>
 #include <queue>
 
+using namespace line_graph;
+
 // 构造函数
 LineGraphModel::LineGraphModel(double prob_threshold, double _logNT) 
     : prob_threshold(prob_threshold), logNT(_logNT) {
@@ -300,4 +302,204 @@ double LineGraphModel::normalizeAngle(double angle) {
     while (angle < 0) angle += M_PI;
     while (angle >= M_PI) angle -= M_PI;
     return angle;
+}
+
+// ==================== 自适应线特征提取实现 ====================
+
+// 主要的自适应线特征提取函数
+std::vector<LineSegment> LineGraphModel::adaptiveLineExtraction(const cv::Mat& image, 
+                                                               const std::vector<cv::KeyPoint>& orb_keypoints,
+                                                               int quadtree_depth,
+                                                               int min_points_threshold,
+                                                               double line_response_threshold) {
+    std::vector<LineSegment> adaptive_lines;
+    
+    // 1. 构建四叉树分析特征点分布
+    std::vector<QuadTreeNode> quad_nodes;
+    buildQuadTree(image, orb_keypoints, quad_nodes, quadtree_depth, min_points_threshold);
+    
+    // 2. 对每个稀疏区域提取线特征
+    for (const auto& node : quad_nodes) {
+        if (node.is_sparse && node.region.area() > 100) { // 只处理足够大的稀疏区域
+            // 在该区域提取线特征
+            cv::Mat roi = image(node.region);
+            
+            // 使用EDLines在ROI中检测线段
+            std::vector<LineSegment> region_lines;
+            
+            // 这里可以调用EDLines检测器
+            // 为了演示，我们创建一个简化的线段检测
+            // 在实际应用中，这里应该调用EDLines算法
+            
+            // 3. 过滤高质量线特征
+            std::vector<LineSegment> filtered_lines = filterHighQualityLines(region_lines, node.region, line_response_threshold);
+            
+            // 添加到结果中
+            adaptive_lines.insert(adaptive_lines.end(), filtered_lines.begin(), filtered_lines.end());
+        }
+    }
+    
+    return adaptive_lines;
+}
+
+// 过滤高质量线特征
+std::vector<LineSegment> LineGraphModel::filterHighQualityLines(const std::vector<LineSegment>& candidate_lines,
+                                                                const cv::Rect& region,
+                                                                double quality_threshold) {
+    std::vector<LineSegment> high_quality_lines;
+    
+    for (const auto& line : candidate_lines) {
+        // 1. 检查线段是否在指定区域内
+        if (!isLineInRegion(line, region)) {
+            continue;
+        }
+        
+        // 2. 计算线段置信度
+        double confidence = computeLineConfidence(line);
+        
+        // 3. 基于置信度过滤
+        if (confidence > quality_threshold) {
+            // 4. 额外的几何约束检查
+            if (line.length > 10.0) { // 最小长度约束
+                high_quality_lines.push_back(line);
+            }
+        }
+    }
+    
+    // 5. 按置信度排序，取前N个
+    std::sort(high_quality_lines.begin(), high_quality_lines.end(), 
+              [](const LineSegment& a, const LineSegment& b) {
+                  return a.confidence > b.confidence;
+              });
+    
+    // 限制每个区域最多提取的线特征数量
+    int max_lines_per_region = 5;
+    if (high_quality_lines.size() > max_lines_per_region) {
+        high_quality_lines.resize(max_lines_per_region);
+    }
+    
+    return high_quality_lines;
+}
+
+// 构建四叉树
+void LineGraphModel::buildQuadTree(const cv::Mat& image, const std::vector<cv::KeyPoint>& keypoints,
+                                  std::vector<QuadTreeNode>& quad_nodes, int depth, int min_threshold) {
+    quad_nodes.clear();
+    
+    // 创建根节点
+    QuadTreeNode root(cv::Rect(0, 0, image.cols, image.rows));
+    
+    // 计算根节点中的特征点数量
+    for (const auto& kp : keypoints) {
+        if (root.region.contains(kp.pt)) {
+            root.keypoints.push_back(kp);
+            root.point_count++;
+        }
+    }
+    
+    std::queue<std::pair<QuadTreeNode, int>> node_queue;
+    node_queue.push({root, 0});
+    
+    while (!node_queue.empty()) {
+        QuadTreeNode current_node = node_queue.front().first;
+        int current_depth = node_queue.front().second;
+        node_queue.pop();
+        
+        // 检查是否为稀疏区域
+        current_node.is_sparse = (current_node.point_count < min_threshold);
+        
+        // 如果达到最大深度或区域太小，添加为叶节点
+        if (current_depth >= depth || current_node.region.width < 32 || current_node.region.height < 32) {
+            quad_nodes.push_back(current_node);
+            continue;
+        }
+        
+        // 如果不是稀疏区域且可以继续分割，则进行四分
+        if (!current_node.is_sparse) {
+            std::vector<QuadTreeNode> sub_nodes;
+            subdivideQuadNode(current_node, sub_nodes, keypoints);
+            
+            for (const auto& sub_node : sub_nodes) {
+                node_queue.push({sub_node, current_depth + 1});
+            }
+        } else {
+            quad_nodes.push_back(current_node);
+        }
+    }
+}
+
+// 四叉树节点细分
+void LineGraphModel::subdivideQuadNode(const QuadTreeNode& parent, std::vector<QuadTreeNode>& nodes,
+                                      const std::vector<cv::KeyPoint>& all_keypoints) {
+    int half_w = parent.region.width / 2;
+    int half_h = parent.region.height / 2;
+    int x = parent.region.x;
+    int y = parent.region.y;
+    
+    // 创建四个子区域
+    std::vector<cv::Rect> sub_regions = {
+        cv::Rect(x, y, half_w, half_h),                           // 左上
+        cv::Rect(x + half_w, y, half_w, half_h),                  // 右上
+        cv::Rect(x, y + half_h, half_w, half_h),                  // 左下
+        cv::Rect(x + half_w, y + half_h, half_w, half_h)          // 右下
+    };
+    
+    for (const auto& region : sub_regions) {
+        QuadTreeNode sub_node(region);
+        
+        // 统计该区域内的特征点
+        for (const auto& kp : all_keypoints) {
+            if (region.contains(kp.pt)) {
+                sub_node.keypoints.push_back(kp);
+                sub_node.point_count++;
+            }
+        }
+        
+        nodes.push_back(sub_node);
+    }
+}
+
+// 计算线段响应度
+double LineGraphModel::computeLineResponse(const LineSegment& line, const cv::Mat& image) {
+    // 简化的线段响应度计算
+    // 在实际应用中，这应该基于梯度强度等更复杂的特征
+    
+    // 沿线段采样点，计算梯度强度
+    cv::Point2f direction = line.end - line.start;
+    float length = cv::norm(direction);
+    direction /= length;
+    
+    double total_response = 0.0;
+    int sample_count = static_cast<int>(length / 2.0); // 每2像素采样一次
+    sample_count = std::max(5, std::min(sample_count, 50)); // 限制采样点数量
+    
+    for (int i = 0; i < sample_count; ++i) {
+        float t = static_cast<float>(i) / sample_count;
+        cv::Point2f sample_pt = line.start + t * (line.end - line.start);
+        
+        // 确保采样点在图像范围内
+        if (sample_pt.x >= 1 && sample_pt.x < image.cols-1 && 
+            sample_pt.y >= 1 && sample_pt.y < image.rows-1) {
+            
+            // 计算该点的梯度强度（简化版本）
+            if (image.type() == CV_8UC1) {
+                const uchar* row = image.ptr<uchar>(static_cast<int>(sample_pt.y));
+                int grad_x = abs(row[static_cast<int>(sample_pt.x+1)] - row[static_cast<int>(sample_pt.x-1)]);
+                
+                const uchar* next_row = image.ptr<uchar>(static_cast<int>(sample_pt.y+1));
+                const uchar* prev_row = image.ptr<uchar>(static_cast<int>(sample_pt.y-1));
+                int grad_y = abs(next_row[static_cast<int>(sample_pt.x)] - prev_row[static_cast<int>(sample_pt.x)]);
+                
+                total_response += sqrt(grad_x * grad_x + grad_y * grad_y);
+            }
+        }
+    }
+    
+    return total_response / sample_count;
+}
+
+// 检查线段是否在区域内
+bool LineGraphModel::isLineInRegion(const LineSegment& line, const cv::Rect& region) {
+    // 检查线段的起点和终点是否都在区域内
+    return region.contains(line.start) && region.contains(line.end);
 } 

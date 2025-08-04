@@ -32,6 +32,10 @@ CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/g2o/g2o/type
 CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/g2o/g2o/types/types_sba.h
 CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h
 CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/g2o/g2o/types/types_six_dof_expmap.h
+CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/line_descriptor/include/ED.h
+CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/line_descriptor/include/EDColor.h
+CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/line_descriptor/include/EDLines.h
+CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/line_descriptor/include/NFA.h
 CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/line_descriptor/include/line_descriptor/descriptor_custom.hpp
 CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../Thirdparty/line_descriptor/include/line_descriptor_custom.hpp
 CMakeFiles/rgbd_tum.dir/Examples/RGB-D/rgbd_tum.cc.o: ../include/Atlas.h

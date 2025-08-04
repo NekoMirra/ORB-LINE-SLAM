@@ -8,10 +8,11 @@
 #include <iostream>
 
 #include "ORBextractor.h"
-
+#include "LineGraphModel.h"
 
 using namespace cv;
 using namespace std;
+using namespace line_graph;
 
 namespace ORB_SLAM3
 {
@@ -357,8 +358,15 @@ namespace ORB_SLAM3
     ORBextractor::ORBextractor(int _nfeatures, float _scaleFactor, int _nlevels,
                                int _iniThFAST, int _minThFAST):
             nfeatures(_nfeatures), scaleFactor(_scaleFactor), nlevels(_nlevels),
-            iniThFAST(_iniThFAST), minThFAST(_minThFAST)
+            iniThFAST(_iniThFAST), minThFAST(_minThFAST),
+            mbAdaptiveLineExtraction(true), mfLineMinLength(20.0f), 
+            mfLineMaxError(2.0f), mfSparsityThreshold(5.0f),
+            mfMinAngle(0.0f), mfMaxAngle(180.0f), mfMinResponse(10.0f),
+            edLines(nullptr), mLineGraphModel(nullptr)
     {
+        // 初始化LineGraphModel
+        mLineGraphModel = new line_graph::LineGraphModel();
+        
         mvScaleFactor.resize(nlevels);
         mvLevelSigma2.resize(nlevels);
         mvScaleFactor[0]=1.0f;
@@ -414,6 +422,12 @@ namespace ORB_SLAM3
             umax[v] = v0;
             ++v0;
         }
+    }
+
+    ORBextractor::~ORBextractor()
+    {
+        if(edLines) delete edLines;
+        if(mLineGraphModel) delete mLineGraphModel;
     }
 
     static void computeOrientation(const Mat& image, vector<KeyPoint>& keypoints, const vector<int>& umax)
@@ -481,6 +495,84 @@ namespace ORB_SLAM3
         if(n4.vKeys.size()==1)
             n4.bNoMore = true;
 
+        // Distribute line features to child nodes
+        for(size_t i=0; i<vLines.size(); i++)
+        {
+            const Line &line = vLines[i];
+            cv::Point2f center = (line.start + line.end) * 0.5f;
+            
+            if(center.x < n1.UR.x)
+            {
+                if(center.y < n1.BR.y)
+                    n1.vLines.push_back(line);
+                else
+                    n3.vLines.push_back(line);
+            }
+            else if(center.y < n1.BR.y)
+                n2.vLines.push_back(line);
+            else
+                n4.vLines.push_back(line);
+        }
+
+        // Update line feature flags
+        n1.bHasLineFeatures = !n1.vLines.empty();
+        n2.bHasLineFeatures = !n2.vLines.empty();
+        n3.bHasLineFeatures = !n3.vLines.empty();
+        n4.bHasLineFeatures = !n4.vLines.empty();
+
+    }
+
+    bool ExtractorNode::hasLineFeatures() const
+    {
+        return bHasLineFeatures && !vLines.empty();
+    }
+
+    void ExtractorNode::processLineFeatures(const cv::Mat& image, LineGraphModel& lineModel)
+    {
+        if (!bHasLineFeatures) return;
+        
+        // Filter and validate existing line features
+        std::vector<Line> validLines;
+        for (const auto& line : vLines) {
+            if (line.isValid && line.length > 15.0f) {
+                validLines.push_back(line);
+            }
+        }
+        vLines = validLines;
+        bHasLineFeatures = !vLines.empty();
+    }
+
+    void ExtractorNode::extractAdaptiveLineFeatures(const cv::Mat& image, LineGraphModel& lineModel, 
+                                                  float sparsityThreshold)
+    {
+        // Check if this region has sparse point features
+        cv::Rect nodeRegion(UL.x, UL.y, UR.x - UL.x, BR.y - UL.y);
+        
+        // Ensure region is within image bounds
+        nodeRegion &= cv::Rect(0, 0, image.cols, image.rows);
+        if (nodeRegion.width <= 0 || nodeRegion.height <= 0) return;
+        
+        float pointDensity = static_cast<float>(vKeys.size()) / (nodeRegion.width * nodeRegion.height) * 10000;
+        
+        if (pointDensity < sparsityThreshold) {
+            // Extract line features in sparse regions
+            cv::Mat roi = image(nodeRegion);
+            
+            // Use adaptive line extraction from LineGraphModel
+            std::vector<LineSegment> extractedSegments = lineModel.adaptiveLineExtraction(roi, vKeys, 3, 5, 0.3);
+            
+            for (const auto& segment : extractedSegments) {
+                cv::Point2f start(segment.start.x + nodeRegion.x, segment.start.y + nodeRegion.y);
+                cv::Point2f end(segment.end.x + nodeRegion.x, segment.end.y + nodeRegion.y);
+                
+                float length = cv::norm(end - start);
+                if (length > 20.0f) {  // Minimum line length threshold
+                    Line lineFeature(start, end, segment.confidence);
+                    vLines.push_back(lineFeature);
+                }
+            }
+            bHasLineFeatures = !vLines.empty();
+        }
     }
 
     vector<cv::KeyPoint> ORBextractor::DistributeOctTree(const vector<cv::KeyPoint>& vToDistributeKeys, const int &minX,
@@ -685,25 +777,118 @@ namespace ORB_SLAM3
             }
         }
 
-        // Retain the best point in each node
+        // Retain the best point in each node and check for line features in sparse nodes
         vector<cv::KeyPoint> vResultKeys;
         vResultKeys.reserve(nfeatures);
         for(list<ExtractorNode>::iterator lit=lNodes.begin(); lit!=lNodes.end(); lit++)
         {
             vector<cv::KeyPoint> &vNodeKeys = lit->vKeys;
-            cv::KeyPoint* pKP = &vNodeKeys[0];
-            float maxResponse = pKP->response;
-
-            for(size_t k=1;k<vNodeKeys.size();k++)
+            
+            if(vNodeKeys.empty())
             {
-                if(vNodeKeys[k].response>maxResponse)
-                {
-                    pKP = &vNodeKeys[k];
-                    maxResponse = vNodeKeys[k].response;
+                // 如果当前节点没有特征点，检查该区域是否需要提取线特征
+                cv::Rect nodeRegion(lit->UL.x, lit->UL.y, 
+                                   lit->UR.x - lit->UL.x, lit->BR.y - lit->UL.y);
+                
+                // 确保区域在图像范围内
+                if (nodeRegion.x >= 0 && nodeRegion.y >= 0 && 
+                    nodeRegion.x + nodeRegion.width < mvImagePyramid[0].cols &&
+                    nodeRegion.y + nodeRegion.height < mvImagePyramid[0].rows) {
+                    
+                    // 在该区域提取线特征
+                    cv::Mat roi = mvImagePyramid[0](nodeRegion);
+                    
+                    // 使用EDLines进行线检测
+                    if (!edLines) {
+                        edLines = new EDLines(roi, mfLineMaxError, (int)mfLineMinLength);
+                    } else {
+                        EDLines* tempEdLines = new EDLines(roi, mfLineMaxError, (int)mfLineMinLength);
+                        std::vector<cv::Vec4f> detectedLines = tempEdLines->getLines();
+                        delete tempEdLines;
+                        
+                        // 转换并存储线特征
+                        for (const auto& line : detectedLines) {
+                            cv::Point2f adjustedStart(line[0] + nodeRegion.x, line[1] + nodeRegion.y);
+                            cv::Point2f adjustedEnd(line[2] + nodeRegion.x, line[3] + nodeRegion.y);
+                            Line lineFeature(adjustedStart, adjustedEnd, 0, 0);
+                            
+                            if (filterLineCondition(lineFeature)) {
+                                lit->vLines.push_back(lineFeature);
+                                lit->bHasLineFeatures = true;
+                            }
+                        }
+                    }
                 }
             }
+            else
+            {
+                cv::KeyPoint* pKP = &vNodeKeys[0];
+                float maxResponse = pKP->response;
 
-            vResultKeys.push_back(*pKP);
+                for(size_t k=1;k<vNodeKeys.size();k++)
+                {
+                    if(vNodeKeys[k].response>maxResponse)
+                    {
+                        pKP = &vNodeKeys[k];
+                        maxResponse = vNodeKeys[k].response;
+                    }
+                }
+
+                vResultKeys.push_back(*pKP);
+            }
+        }
+
+        return vResultKeys;
+    }
+
+    vector<cv::KeyPoint> ORBextractor::DistributeOctTreeWithLines(const vector<cv::KeyPoint>& vToDistributeKeys, 
+                                           const int &minX, const int &maxX, const int &minY, const int &maxY, 
+                                           const int &N, const int &level, const cv::Mat& image)
+    {
+        // First perform standard point distribution
+        vector<cv::KeyPoint> vResultKeys = DistributeOctTree(vToDistributeKeys, minX, maxX, minY, maxY, N, level);
+        
+        if (!mbAdaptiveLineExtraction) {
+            return vResultKeys;
+        }
+
+        // Then process line features in regions with sparse point features
+        const int nIni = round(static_cast<float>(maxX-minX)/(maxY-minY));
+        const float hX = static_cast<float>(maxX-minX)/nIni;
+
+        list<ExtractorNode> lNodes;
+        vector<ExtractorNode*> vpIniNodes;
+        vpIniNodes.resize(nIni);
+
+        for(int i=0; i<nIni; i++)
+        {
+            ExtractorNode ni;
+            ni.UL = cv::Point2i(hX*static_cast<float>(i),0);
+            ni.UR = cv::Point2i(hX*static_cast<float>(i+1),0);
+            ni.BL = cv::Point2i(ni.UL.x,maxY-minY);
+            ni.BR = cv::Point2i(ni.UR.x,maxY-minY);
+            lNodes.push_back(ni);
+            vpIniNodes[i] = &lNodes.back();
+        }
+
+        // Associate points to initial nodes for sparsity analysis
+        for(size_t i=0; i<vResultKeys.size(); i++)
+        {
+            const cv::KeyPoint &kp = vResultKeys[i];
+            int nodeIdx = std::min((int)(kp.pt.x/hX), nIni-1);
+            vpIniNodes[nodeIdx]->vKeys.push_back(kp);
+        }
+
+        // Extract adaptive line features in sparse regions
+        for(int i=0; i<nIni; i++)
+        {
+            vpIniNodes[i]->extractAdaptiveLineFeatures(image, *mLineGraphModel, mfSparsityThreshold);
+            if (vpIniNodes[i]->hasLineFeatures()) {
+                // Store extracted lines
+                for (const auto& line : vpIniNodes[i]->vLines) {
+                    mvExtractedLines.push_back(line);
+                }
+            }
         }
 
         return vResultKeys;
@@ -1094,6 +1279,42 @@ namespace ORB_SLAM3
                 i++;
             }
         }
+        
+        // 添加线特征提取逻辑
+        lineFeatures.clear();
+        lineFeatures.resize(nlevels);
+        
+        // 在提取完特征点后，检查每个特征点的位置
+        for (int level = 0; level < nlevels; ++level) {
+            vector<KeyPoint>& keypoints = allKeypoints[level];
+            vector<Line> levelLines;
+            
+            for (vector<KeyPoint>::iterator keypoint = keypoints.begin(); 
+                 keypoint != keypoints.end(); ++keypoint) {
+                // 检查该位置是否已经提取到线特征
+                if (!hasLineFeature(keypoint->pt, level)) {
+                    // 使用 EDLines 提取线特征
+                    EDLines* tempEdLines = new EDLines(mvImagePyramid[level], mfLineMaxError, (int)mfLineMinLength);
+                    std::vector<cv::Vec4f> detectedLines = tempEdLines->getLines();
+                    delete tempEdLines;
+                    
+                    // 转换为我们的Line结构
+                    for (const auto& detectedLine : detectedLines) {
+                        cv::Point2f start(detectedLine[0], detectedLine[1]);
+                        cv::Point2f end(detectedLine[2], detectedLine[3]);
+                        Line line(start, end, 0, level);
+                        if (filterLineCondition(line)) {
+                            levelLines.push_back(line);
+                        }
+                    }
+                }
+            }
+            
+            // 处理提取到的线特征
+            processLineFeatures(levelLines);
+            lineFeatures[level] = levelLines;
+        }
+        
         //cout << "[ORBextractor]: extracted " << _keypoints.size() << " KeyPoints" << endl;
         return monoIndex;
     }
@@ -1123,6 +1344,187 @@ namespace ORB_SLAM3
             }
         }
 
+    }
+
+    void ORBextractor::ExtractLineFeatures(const cv::Mat& image, std::vector<Line>& lines, int level)
+    {
+        lines.clear();
+        
+        // Use LineGraphModel for line detection
+        std::vector<line_graph::LineSegment> detectedSegments = mLineGraphModel->adaptiveLineExtraction(image, std::vector<cv::KeyPoint>(), 3, 5, 0.3);
+        
+        float scale = mvScaleFactor[level];
+        
+        for (const auto& segment : detectedSegments) {
+            cv::Point2f start(segment.start.x * scale, segment.start.y * scale);
+            cv::Point2f end(segment.end.x * scale, segment.end.y * scale);
+            
+            float length = cv::norm(end - start);
+            if (length > mfLineMinLength) {
+                Line lineFeature(start, end, segment.confidence, level);
+                lines.push_back(lineFeature);
+            }
+        }
+    }
+
+    void ORBextractor::FilterLineFeatures(std::vector<Line>& lines, float minLength, float maxLineError)
+    {
+        std::vector<Line> filteredLines;
+        
+        for (auto& line : lines) {
+            if (line.length >= minLength && line.isValid) {
+                // Additional filtering based on line quality can be added here
+                filteredLines.push_back(line);
+            }
+        }
+        
+        lines = filteredLines;
+    }
+
+    bool ORBextractor::IsSparseSampling(const std::vector<cv::KeyPoint>& keypoints, 
+                                       const cv::Rect& region, float threshold)
+    {
+        int pointsInRegion = 0;
+        for (const auto& kp : keypoints) {
+            if (region.contains(kp.pt)) {
+                pointsInRegion++;
+            }
+        }
+        
+        float density = static_cast<float>(pointsInRegion) / (region.width * region.height) * 10000;
+        return density < threshold;
+    }
+
+    // Enhanced operator that also extracts line features
+    int ORBextractor::operator()( cv::InputArray _image, cv::InputArray _mask,
+                                std::vector<cv::KeyPoint>& _keypoints,
+                                cv::OutputArray _descriptors, std::vector<int> &vLappingArea,
+                                std::vector<Line>& _lines)
+    {
+        // Clear previous line features
+        mvExtractedLines.clear();
+        _lines.clear();
+        
+        // First extract standard ORB features
+        int result = operator()(_image, _mask, _keypoints, _descriptors, vLappingArea);
+        
+        // Then extract line features if adaptive extraction is enabled
+        if (mbAdaptiveLineExtraction) {
+            cv::Mat image = _image.getMat();
+            
+            for (int level = 0; level < nlevels; ++level) {
+                std::vector<Line> levelLines;
+                ExtractLineFeatures(mvImagePyramid[level], levelLines, level);
+                
+                FilterLineFeatures(levelLines, mfLineMinLength, mfLineMaxError);
+                
+                mvExtractedLines.insert(mvExtractedLines.end(), levelLines.begin(), levelLines.end());
+            }
+            
+            _lines = mvExtractedLines;
+        }
+        
+        return result;
+    }
+
+    // 实现 hasLineFeature 函数
+    bool ORBextractor::hasLineFeature(const cv::Point2f& pt, int level)
+    {
+        // 检查该位置周围是否已经有线特征
+        const float searchRadius = 10.0f; // 搜索半径
+        
+        if (level < lineFeatures.size()) {
+            for (const auto& line : lineFeatures[level]) {
+                // 计算点到线段的距离
+                cv::Point2f lineVec = line.end - line.start;
+                cv::Point2f pointVec = pt - line.start;
+                
+                float lineLengthSq = lineVec.dot(lineVec);
+                if (lineLengthSq < 1e-6) continue; // 避免除零
+                
+                float t = std::max(0.0f, std::min(1.0f, pointVec.dot(lineVec) / lineLengthSq));
+                cv::Point2f projection = line.start + t * lineVec;
+                
+                float distanceSq = cv::norm(pt - projection);
+                if (distanceSq < searchRadius * searchRadius) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // 实现 processLineFeatures 函数
+    void ORBextractor::processLineFeatures(const std::vector<Line>& lines)
+    {
+        // 存储线特征
+        std::vector<Line> filteredLines;
+        filteredLines.reserve(lines.size());
+
+        // 过滤线特征
+        for (const auto& line : lines) {
+            // 过滤条件：长度大于某个阈值，角度在某个范围内
+            if (filterLineCondition(line)) {
+                filteredLines.push_back(line);
+            }
+        }
+
+        // 存储过滤后的线特征
+        mvExtractedLines.insert(mvExtractedLines.end(), filteredLines.begin(), filteredLines.end());
+
+        // 利用线特征进行后续处理
+        // 例如，进行特征匹配
+        if (!filteredLines.empty()) {
+            matchLineFeatures(filteredLines);
+        }
+    }
+
+    // 实现 matchLineFeatures 函数
+    void ORBextractor::matchLineFeatures(const std::vector<Line>& lines)
+    {
+        // 实现特征匹配逻辑
+        // 这里可以根据需求实现具体的匹配逻辑
+        
+        // 示例：基于角度和长度的简单匹配
+        for (size_t i = 0; i < lines.size(); ++i) {
+            for (size_t j = i + 1; j < lines.size(); ++j) {
+                const Line& line1 = lines[i];
+                const Line& line2 = lines[j];
+                
+                // 计算角度差
+                float angleDiff = std::abs(line1.angle - line2.angle);
+                angleDiff = std::min(angleDiff, static_cast<float>(CV_PI) - angleDiff);
+                
+                // 计算长度比
+                float lengthRatio = std::min(line1.length, line2.length) / 
+                                   std::max(line1.length, line2.length);
+                
+                // 如果角度相似且长度相近，认为可能是匹配的线特征
+                if (angleDiff < 0.1f && lengthRatio > 0.8f) {
+                    // 这里可以记录匹配关系或进行进一步处理
+                    // 例如：存储匹配对，用于后续的几何验证
+                }
+            }
+        }
+    }
+
+    // 实现 filterLineCondition 函数
+    bool ORBextractor::filterLineCondition(const Line& line)
+    {
+        // 过滤条件：长度、角度、响应强度
+        if (line.length < mfLineMinLength) {
+            return false;
+        }
+        
+        if (line.angle < mfMinAngle || line.angle > mfMaxAngle) {
+            return false;
+        }
+        
+        if (line.response < mfMinResponse) {
+            return false;
+        }
+        
+        return true;
     }
 
 } //namespace ORB_SLAM

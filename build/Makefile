@@ -616,6 +616,33 @@ Examples/Stereo-Line/stereo_line_euroc.cc.s:
 	$(MAKE) -f CMakeFiles/stereo_line_euroc.dir/build.make CMakeFiles/stereo_line_euroc.dir/Examples/Stereo-Line/stereo_line_euroc.cc.s
 .PHONY : Examples/Stereo-Line/stereo_line_euroc.cc.s
 
+Thirdparty/line_descriptor/src/LineGraphModel.o: Thirdparty/line_descriptor/src/LineGraphModel.cpp.o
+
+.PHONY : Thirdparty/line_descriptor/src/LineGraphModel.o
+
+# target to build an object file
+Thirdparty/line_descriptor/src/LineGraphModel.cpp.o:
+	$(MAKE) -f CMakeFiles/ORB_SLAM3.dir/build.make CMakeFiles/ORB_SLAM3.dir/Thirdparty/line_descriptor/src/LineGraphModel.cpp.o
+.PHONY : Thirdparty/line_descriptor/src/LineGraphModel.cpp.o
+
+Thirdparty/line_descriptor/src/LineGraphModel.i: Thirdparty/line_descriptor/src/LineGraphModel.cpp.i
+
+.PHONY : Thirdparty/line_descriptor/src/LineGraphModel.i
+
+# target to preprocess a source file
+Thirdparty/line_descriptor/src/LineGraphModel.cpp.i:
+	$(MAKE) -f CMakeFiles/ORB_SLAM3.dir/build.make CMakeFiles/ORB_SLAM3.dir/Thirdparty/line_descriptor/src/LineGraphModel.cpp.i
+.PHONY : Thirdparty/line_descriptor/src/LineGraphModel.cpp.i
+
+Thirdparty/line_descriptor/src/LineGraphModel.s: Thirdparty/line_descriptor/src/LineGraphModel.cpp.s
+
+.PHONY : Thirdparty/line_descriptor/src/LineGraphModel.s
+
+# target to generate assembly for a file
+Thirdparty/line_descriptor/src/LineGraphModel.cpp.s:
+	$(MAKE) -f CMakeFiles/ORB_SLAM3.dir/build.make CMakeFiles/ORB_SLAM3.dir/Thirdparty/line_descriptor/src/LineGraphModel.cpp.s
+.PHONY : Thirdparty/line_descriptor/src/LineGraphModel.cpp.s
+
 src/Atlas.o: src/Atlas.cc.o
 
 .PHONY : src/Atlas.o
@@ -1538,6 +1565,9 @@ help:
 	@echo "... Examples/Stereo-Line/stereo_line_euroc.o"
 	@echo "... Examples/Stereo-Line/stereo_line_euroc.i"
 	@echo "... Examples/Stereo-Line/stereo_line_euroc.s"
+	@echo "... Thirdparty/line_descriptor/src/LineGraphModel.o"
+	@echo "... Thirdparty/line_descriptor/src/LineGraphModel.i"
+	@echo "... Thirdparty/line_descriptor/src/LineGraphModel.s"
 	@echo "... src/Atlas.o"
 	@echo "... src/Atlas.i"
 	@echo "... src/Atlas.s"

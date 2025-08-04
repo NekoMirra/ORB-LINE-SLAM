@@ -90,11 +90,13 @@ src/LineExtractor.cc
 src/LineIterator.cpp
 src/LineMatcher.cpp
 src/MapLine.cc
+Thirdparty/line_descriptor/src/LineGraphModel.cpp
 include/gridStructure.h
 include/LineExtractor.h
 include/LineIterator.h
 include/LineMatcher.h
 include/MapLine.h
+Thirdparty/line_descriptor/include/LineGraphModel.h
 include/System.h
 include/Tracking.h
 include/LocalMapping.h

@@ -51,7 +51,7 @@ struct LS {
 }; 
 
 
-struct LineSegment {
+struct EDLineSegment {
 	double a, b;          // y = a + bx (if invert = 0) || x = a + by (if invert = 1)
 	int invert;
 
@@ -62,7 +62,7 @@ struct LineSegment {
 	int firstPixelIndex;  // Index of the first pixel within the segment of pixels
 	int len;              // No of pixels making up the line segment
 
-	LineSegment(double _a, double _b, int _invert, double _sx, double _sy, double _ex, double _ey, int _segmentNo, int _firstPixelIndex, int _len) {
+	EDLineSegment(double _a, double _b, int _invert, double _sx, double _sy, double _ex, double _ey, int _segmentNo, int _firstPixelIndex, int _len) {
 		a = _a;
 		b = _b;
 		invert = _invert;
@@ -91,11 +91,11 @@ public:
 	cv::Mat drawOnImage();
 
 	// EDCircle uses this one 
-	static void SplitSegment2Lines(double *x, double *y, int noPixels, int segmentNo, std::vector<LineSegment> &lines, int min_line_len = 6, double line_error = 1.0);
+	static void SplitSegment2Lines(double *x, double *y, int noPixels, int segmentNo, std::vector<EDLineSegment> &lines, int min_line_len = 6, double line_error = 1.0);
 
 private:
-	std::vector<LineSegment> lines;
-	std::vector<LineSegment> invalidLines;
+	std::vector<EDLineSegment> lines;
+	std::vector<EDLineSegment> invalidLines;
 	std::vector<LS> linePoints;
 	std::vector<cv::Vec4f> lines_ED;
 	int linesNo;
@@ -112,15 +112,15 @@ private:
 	void JoinCollinearLines();
 	
 	void ValidateLineSegments();
-	bool ValidateLineSegmentRect(int *x, int *y, LineSegment *ls);
-	bool TryToJoinTwoLineSegments(LineSegment *ls1, LineSegment *ls2, int changeIndex);
+	bool ValidateLineSegmentRect(int *x, int *y, EDLineSegment *ls);
+	bool TryToJoinTwoLineSegments(EDLineSegment *ls1, EDLineSegment *ls2, int changeIndex);
 	
 	static double ComputeMinDistance(double x1, double y1, double a, double b, int invert);
 	static void ComputeClosestPoint(double x1, double y1, double a, double b, int invert, double &xOut, double &yOut);
 	static void LineFit(double *x, double *y, int count, double &a, double &b, int invert);
 	static void LineFit(double *x, double *y, int count, double &a, double &b, double &e, int &invert);
-	static double ComputeMinDistanceBetweenTwoLines(LineSegment *ls1, LineSegment *ls2, int *pwhich);
-	static void UpdateLineParameters(LineSegment *ls);
+	static double ComputeMinDistanceBetweenTwoLines(EDLineSegment *ls1, EDLineSegment *ls2, int *pwhich);
+	static void UpdateLineParameters(EDLineSegment *ls);
 	static void EnumerateRectPoints(double sx, double sy, double ex, double ey,int ptsx[], int ptsy[], int *pNoPoints);
 
 	// Utility math functions

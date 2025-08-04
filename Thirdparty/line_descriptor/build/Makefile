@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named adaptive_feature_example
+
+# Build rule for target.
+adaptive_feature_example: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 adaptive_feature_example
+.PHONY : adaptive_feature_example
+
+# fast build rule for target.
+adaptive_feature_example/fast:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/build
+.PHONY : adaptive_feature_example/fast
+
+#=============================================================================
 # Target rules for targets named line_graph_example
 
 # Build rule for target.
@@ -290,6 +303,7 @@ src/ED_Lib/NFA.o: src/ED_Lib/NFA.cpp.o
 
 # target to build an object file
 src/ED_Lib/NFA.cpp.o:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/ED_Lib/NFA.cpp.o
 	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/src/ED_Lib/NFA.cpp.o
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/src/ED_Lib/NFA.cpp.o
 .PHONY : src/ED_Lib/NFA.cpp.o
@@ -300,6 +314,7 @@ src/ED_Lib/NFA.i: src/ED_Lib/NFA.cpp.i
 
 # target to preprocess a source file
 src/ED_Lib/NFA.cpp.i:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/ED_Lib/NFA.cpp.i
 	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/src/ED_Lib/NFA.cpp.i
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/src/ED_Lib/NFA.cpp.i
 .PHONY : src/ED_Lib/NFA.cpp.i
@@ -310,6 +325,7 @@ src/ED_Lib/NFA.s: src/ED_Lib/NFA.cpp.s
 
 # target to generate assembly for a file
 src/ED_Lib/NFA.cpp.s:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/ED_Lib/NFA.cpp.s
 	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/src/ED_Lib/NFA.cpp.s
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/src/ED_Lib/NFA.cpp.s
 .PHONY : src/ED_Lib/NFA.cpp.s
@@ -347,6 +363,7 @@ src/LineGraphModel.o: src/LineGraphModel.cpp.o
 
 # target to build an object file
 src/LineGraphModel.cpp.o:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/LineGraphModel.cpp.o
 	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/src/LineGraphModel.cpp.o
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/src/LineGraphModel.cpp.o
 .PHONY : src/LineGraphModel.cpp.o
@@ -357,6 +374,7 @@ src/LineGraphModel.i: src/LineGraphModel.cpp.i
 
 # target to preprocess a source file
 src/LineGraphModel.cpp.i:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/LineGraphModel.cpp.i
 	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/src/LineGraphModel.cpp.i
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/src/LineGraphModel.cpp.i
 .PHONY : src/LineGraphModel.cpp.i
@@ -367,9 +385,37 @@ src/LineGraphModel.s: src/LineGraphModel.cpp.s
 
 # target to generate assembly for a file
 src/LineGraphModel.cpp.s:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/LineGraphModel.cpp.s
 	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/src/LineGraphModel.cpp.s
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/src/LineGraphModel.cpp.s
 .PHONY : src/LineGraphModel.cpp.s
+
+src/adaptive_feature_example.o: src/adaptive_feature_example.cpp.o
+
+.PHONY : src/adaptive_feature_example.o
+
+# target to build an object file
+src/adaptive_feature_example.cpp.o:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/adaptive_feature_example.cpp.o
+.PHONY : src/adaptive_feature_example.cpp.o
+
+src/adaptive_feature_example.i: src/adaptive_feature_example.cpp.i
+
+.PHONY : src/adaptive_feature_example.i
+
+# target to preprocess a source file
+src/adaptive_feature_example.cpp.i:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/adaptive_feature_example.cpp.i
+.PHONY : src/adaptive_feature_example.cpp.i
+
+src/adaptive_feature_example.s: src/adaptive_feature_example.cpp.s
+
+.PHONY : src/adaptive_feature_example.s
+
+# target to generate assembly for a file
+src/adaptive_feature_example.cpp.s:
+	$(MAKE) -f CMakeFiles/adaptive_feature_example.dir/build.make CMakeFiles/adaptive_feature_example.dir/src/adaptive_feature_example.cpp.s
+.PHONY : src/adaptive_feature_example.cpp.s
 
 src/binary_descriptor_custom.o: src/binary_descriptor_custom.cpp.o
 
@@ -486,6 +532,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
+	@echo "... adaptive_feature_example"
 	@echo "... edit_cache"
 	@echo "... line_graph_example"
 	@echo "... linedesc"
@@ -514,6 +561,9 @@ help:
 	@echo "... src/LineGraphModel.o"
 	@echo "... src/LineGraphModel.i"
 	@echo "... src/LineGraphModel.s"
+	@echo "... src/adaptive_feature_example.o"
+	@echo "... src/adaptive_feature_example.i"
+	@echo "... src/adaptive_feature_example.s"
 	@echo "... src/binary_descriptor_custom.o"
 	@echo "... src/binary_descriptor_custom.i"
 	@echo "... src/binary_descriptor_custom.s"

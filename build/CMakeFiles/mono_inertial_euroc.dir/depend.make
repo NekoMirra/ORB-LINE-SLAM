@@ -32,6 +32,10 @@ CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_eur
 CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/g2o/g2o/types/types_sba.h
 CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h
 CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/g2o/g2o/types/types_six_dof_expmap.h
+CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/ED.h
+CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/EDColor.h
+CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/EDLines.h
+CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/NFA.h
 CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/line_descriptor/descriptor_custom.hpp
 CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/line_descriptor_custom.hpp
 CMakeFiles/mono_inertial_euroc.dir/Examples/Monocular-Inertial/mono_inertial_euroc.cc.o: ../include/Atlas.h

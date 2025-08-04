@@ -56,6 +56,10 @@ CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_l
 CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/g2o/g2o/types/types_sba.h
 CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h
 CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/g2o/g2o/types/types_six_dof_expmap.h
+CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/ED.h
+CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/EDColor.h
+CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/EDLines.h
+CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/NFA.h
 CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/line_descriptor/descriptor_custom.hpp
 CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../Thirdparty/line_descriptor/include/line_descriptor_custom.hpp
 CMakeFiles/stereo_line_inertial_euroc.dir/Examples/Stereo-Line-Inertial/stereo_line_inertial_euroc.cc.o: ../include/Atlas.h

@@ -314,6 +314,26 @@ types_sba.h
 Eigen/Geometry
 -
 
+../Thirdparty/line_descriptor/include/ED.h
+opencv2/opencv.hpp
+-
+EDColor.h
+../Thirdparty/line_descriptor/include/EDColor.h
+
+../Thirdparty/line_descriptor/include/EDColor.h
+opencv2/opencv.hpp
+-
+
+../Thirdparty/line_descriptor/include/EDLines.h
+ED.h
+../Thirdparty/line_descriptor/include/ED.h
+EDColor.h
+../Thirdparty/line_descriptor/include/EDColor.h
+NFA.h
+../Thirdparty/line_descriptor/include/NFA.h
+
+../Thirdparty/line_descriptor/include/NFA.h
+
 ../Thirdparty/line_descriptor/include/line_descriptor/descriptor_custom.hpp
 map
 -
@@ -695,6 +715,8 @@ list
 -
 opencv/cv.h
 -
+EDLines.h
+../include/EDLines.h
 
 ../include/System.h
 unistd.h

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <random>
 
+using namespace line_graph;
+
 // 生成测试线段数据
 std::vector<LineSegment> generateTestLines(int num_lines = 50) {
     std::vector<LineSegment> lines;

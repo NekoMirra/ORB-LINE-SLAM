@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "../lib/libORB_SLAM3.pdb"
   "../lib/libORB_SLAM3.so"
+  "CMakeFiles/ORB_SLAM3.dir/Thirdparty/line_descriptor/src/LineGraphModel.cpp.o"
   "CMakeFiles/ORB_SLAM3.dir/src/Atlas.cc.o"
   "CMakeFiles/ORB_SLAM3.dir/src/CameraModels/KannalaBrandt8.cpp.o"
   "CMakeFiles/ORB_SLAM3.dir/src/CameraModels/Pinhole.cpp.o"

@@ -47,3 +47,8 @@ add_executable( line_graph_example src/line_graph_example.cpp src/LineGraphModel
 target_link_libraries( line_graph_example ${LINK_LIBS} )
 target_include_directories( line_graph_example PRIVATE include )
 
+# 添加自适应特征提取示例程序
+add_executable( adaptive_feature_example src/adaptive_feature_example.cpp src/LineGraphModel.cpp src/ED_Lib/NFA.cpp )
+target_link_libraries( adaptive_feature_example ${LINK_LIBS} )
+target_include_directories( adaptive_feature_example PRIVATE include )
+
