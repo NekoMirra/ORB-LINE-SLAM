@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/NFA.h
+
+/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/src/ED_Lib/NFA.cpp
+NFA.h
+/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/src/ED_Lib/NFA.h
+math.h
+-
+float.h
+-
+

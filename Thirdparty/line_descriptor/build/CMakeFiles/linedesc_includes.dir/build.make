@@ -59,6 +59,7 @@ CMakeFiles/linedesc_includes: ../include/EDColor.h
 CMakeFiles/linedesc_includes: ../include/EDLib.h
 CMakeFiles/linedesc_includes: ../include/EDLines.h
 CMakeFiles/linedesc_includes: ../include/EDPF.h
+CMakeFiles/linedesc_includes: ../include/LineGraphModel.h
 CMakeFiles/linedesc_includes: ../include/NFA.h
 CMakeFiles/linedesc_includes: ../include/line_descriptor/descriptor_custom.hpp
 CMakeFiles/linedesc_includes: ../include/line_descriptor_custom.hpp

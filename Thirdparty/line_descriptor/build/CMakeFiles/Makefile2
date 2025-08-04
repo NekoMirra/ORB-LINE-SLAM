@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descr
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/line_graph_example.dir/all
 all: CMakeFiles/linedesc.dir/all
 
 .PHONY : all
@@ -63,10 +64,38 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/line_graph_example.dir/clean
 clean: CMakeFiles/linedesc.dir/clean
 clean: CMakeFiles/linedesc_includes.dir/clean
 
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/line_graph_example.dir
+
+# All Build rule for target.
+CMakeFiles/line_graph_example.dir/all:
+	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/depend
+	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build/CMakeFiles --progress-num=1,2,3,4 "Built target line_graph_example"
+.PHONY : CMakeFiles/line_graph_example.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/line_graph_example.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/line_graph_example.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build/CMakeFiles 0
+.PHONY : CMakeFiles/line_graph_example.dir/rule
+
+# Convenience name for target.
+line_graph_example: CMakeFiles/line_graph_example.dir/rule
+
+.PHONY : line_graph_example
+
+# clean rule for target.
+CMakeFiles/line_graph_example.dir/clean:
+	$(MAKE) -f CMakeFiles/line_graph_example.dir/build.make CMakeFiles/line_graph_example.dir/clean
+.PHONY : CMakeFiles/line_graph_example.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/linedesc.dir
@@ -75,7 +104,7 @@ clean: CMakeFiles/linedesc_includes.dir/clean
 CMakeFiles/linedesc.dir/all:
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/depend
 	$(MAKE) -f CMakeFiles/linedesc.dir/build.make CMakeFiles/linedesc.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12 "Built target linedesc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build/CMakeFiles --progress-num=5,6,7,8,9,10,11,12,13,14,15,16 "Built target linedesc"
 .PHONY : CMakeFiles/linedesc.dir/all
 
 # Build rule for subdir invocation for target.
