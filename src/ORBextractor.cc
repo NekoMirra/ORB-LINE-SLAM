@@ -559,7 +559,7 @@ namespace ORB_SLAM3
             cv::Mat roi = image(nodeRegion);
             
             // Use adaptive line extraction from LineGraphModel
-            std::vector<LineSegment> extractedSegments = lineModel.adaptiveLineExtraction(roi, vKeys, 3, 5, 0.3);
+            std::vector<line_graph::LineSegment> extractedSegments = lineModel.adaptiveLineExtraction(roi, vKeys, 3, 5, 0.3);
             
             for (const auto& segment : extractedSegments) {
                 cv::Point2f start(segment.start.x + nodeRegion.x, segment.start.y + nodeRegion.y);

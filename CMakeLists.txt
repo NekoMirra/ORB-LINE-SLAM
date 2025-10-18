@@ -7,6 +7,9 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
+# Suppress non-critical warnings globally to keep build output focused on errors
+add_compile_options(-w)
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3 -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-unused-function")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3 -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-unused-function -Wno-reorder -Wno-comment")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
@@ -90,14 +93,14 @@ src/LineExtractor.cc
 src/LineIterator.cpp
 src/LineMatcher.cpp
 src/MapLine.cc
-src/ReprojectionErrorMonitor.cc
+ReprojectionErrorMonitor.cc
 Thirdparty/line_descriptor/src/LineGraphModel.cpp
 include/gridStructure.h
 include/LineExtractor.h
 include/LineIterator.h
 include/LineMatcher.h
 include/MapLine.h
-include/ReprojectionErrorMonitor.h
+ReprojectionErrorMonitor.h
 Thirdparty/line_descriptor/include/LineGraphModel.h
 include/System.h
 include/Tracking.h

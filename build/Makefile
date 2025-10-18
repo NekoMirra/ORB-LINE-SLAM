@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/mirra/桌面/REFIX/ORB_SLAM3_LINE
+CMAKE_SOURCE_DIR = /mnt/hgfs/REFIX/ORB_SLAM3_LINE
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/build
+CMAKE_BINARY_DIR = /mnt/hgfs/REFIX/ORB_SLAM3_LINE/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/build/CMakeFiles /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/REFIX/ORB_SLAM3_LINE/build/CMakeFiles /mnt/hgfs/REFIX/ORB_SLAM3_LINE/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/REFIX/ORB_SLAM3_LINE/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -615,6 +615,33 @@ Examples/Stereo-Line/stereo_line_euroc.s: Examples/Stereo-Line/stereo_line_euroc
 Examples/Stereo-Line/stereo_line_euroc.cc.s:
 	$(MAKE) -f CMakeFiles/stereo_line_euroc.dir/build.make CMakeFiles/stereo_line_euroc.dir/Examples/Stereo-Line/stereo_line_euroc.cc.s
 .PHONY : Examples/Stereo-Line/stereo_line_euroc.cc.s
+
+ReprojectionErrorMonitor.o: ReprojectionErrorMonitor.cc.o
+
+.PHONY : ReprojectionErrorMonitor.o
+
+# target to build an object file
+ReprojectionErrorMonitor.cc.o:
+	$(MAKE) -f CMakeFiles/ORB_SLAM3.dir/build.make CMakeFiles/ORB_SLAM3.dir/ReprojectionErrorMonitor.cc.o
+.PHONY : ReprojectionErrorMonitor.cc.o
+
+ReprojectionErrorMonitor.i: ReprojectionErrorMonitor.cc.i
+
+.PHONY : ReprojectionErrorMonitor.i
+
+# target to preprocess a source file
+ReprojectionErrorMonitor.cc.i:
+	$(MAKE) -f CMakeFiles/ORB_SLAM3.dir/build.make CMakeFiles/ORB_SLAM3.dir/ReprojectionErrorMonitor.cc.i
+.PHONY : ReprojectionErrorMonitor.cc.i
+
+ReprojectionErrorMonitor.s: ReprojectionErrorMonitor.cc.s
+
+.PHONY : ReprojectionErrorMonitor.s
+
+# target to generate assembly for a file
+ReprojectionErrorMonitor.cc.s:
+	$(MAKE) -f CMakeFiles/ORB_SLAM3.dir/build.make CMakeFiles/ORB_SLAM3.dir/ReprojectionErrorMonitor.cc.s
+.PHONY : ReprojectionErrorMonitor.cc.s
 
 Thirdparty/line_descriptor/src/LineGraphModel.o: Thirdparty/line_descriptor/src/LineGraphModel.cpp.o
 
@@ -1565,6 +1592,9 @@ help:
 	@echo "... Examples/Stereo-Line/stereo_line_euroc.o"
 	@echo "... Examples/Stereo-Line/stereo_line_euroc.i"
 	@echo "... Examples/Stereo-Line/stereo_line_euroc.s"
+	@echo "... ReprojectionErrorMonitor.o"
+	@echo "... ReprojectionErrorMonitor.i"
+	@echo "... ReprojectionErrorMonitor.s"
 	@echo "... Thirdparty/line_descriptor/src/LineGraphModel.o"
 	@echo "... Thirdparty/line_descriptor/src/LineGraphModel.i"
 	@echo "... Thirdparty/line_descriptor/src/LineGraphModel.s"

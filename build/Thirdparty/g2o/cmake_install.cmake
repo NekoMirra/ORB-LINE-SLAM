@@ -1,4 +1,4 @@
-# Install script for directory: /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o
+# Install script for directory: /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

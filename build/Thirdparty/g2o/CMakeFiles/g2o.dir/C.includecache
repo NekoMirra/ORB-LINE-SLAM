@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/g2o/stuff/os_specific.c
+/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/g2o/stuff/os_specific.c
 os_specific.h
-/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/g2o/stuff/os_specific.h
+/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/g2o/stuff/os_specific.h
 
-/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/g2o/stuff/os_specific.h
+/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/g2o/stuff/os_specific.h
 stdio.h
 -
 stdlib.h

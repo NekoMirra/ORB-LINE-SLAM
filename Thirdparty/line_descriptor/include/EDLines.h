@@ -76,6 +76,10 @@ struct EDLineSegment {
 	}
 }; 
 
+// Maintain backward compatibility with code referencing LineSegment
+// Some modules (e.g., EDCircles, examples) refer to LineSegment; alias it to EDLineSegment
+using LineSegment = EDLineSegment;
+
 
 class EDLines : public ED {
 public:

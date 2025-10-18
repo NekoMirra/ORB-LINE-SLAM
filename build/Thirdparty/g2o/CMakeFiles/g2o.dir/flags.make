@@ -3,15 +3,15 @@
 
 # compile C with /usr/bin/cc
 # compile CXX with /usr/bin/c++
-C_FLAGS =   -Wall   -O3 -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-unused-function  -Wall -W -O3 -DNDEBUG -march=native -O3 -march=native -fPIC  
+C_FLAGS =   -Wall   -O3 -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-unused-function  -Wall -W -w -march=native -O3 -march=native -fPIC   -w
 
 C_DEFINES = -DCOMPILEDWITHC11 -DUNIX -Dg2o_EXPORTS
 
-C_INCLUDES = -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/include -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/include/CameraModels -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/include -I/usr/include/eigen3 -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/core -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/types -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/stuff 
+C_INCLUDES = -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/include -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/include/CameraModels -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/include -I/usr/include/eigen3 -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/core -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/types -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/stuff 
 
-CXX_FLAGS =  -Wall   -O3 -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-unused-function -Wno-reorder -Wno-comment -std=c++11  -Wall -W -O3 -DNDEBUG -march=native -O3 -march=native -fPIC  
+CXX_FLAGS =  -Wall   -O3 -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-sign-compare -Wno-unused-function -Wno-reorder -Wno-comment -std=c++11  -Wall -W -w -march=native -O3 -march=native -fPIC   -w
 
 CXX_DEFINES = -DCOMPILEDWITHC11 -DUNIX -Dg2o_EXPORTS
 
-CXX_INCLUDES = -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/include -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/include/CameraModels -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/include -I/usr/include/eigen3 -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/core -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/types -I/home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/stuff 
+CXX_INCLUDES = -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/include -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/include/CameraModels -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/include -I/usr/include/eigen3 -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/core -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/types -I/mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/g2o/stuff 
 

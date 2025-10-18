@@ -180,10 +180,10 @@ public:
     void SetReprojectionErrorThresholds(double errorThreshold, double changeRateThreshold, double durationThreshold);
     
     // Enhanced monitoring and optimization methods
-    // 增强的监控和优化方法
-    void EnableAdaptiveOptimization(bool enable);
-    std::vector<ReprojectionErrorMonitor::OptimizationRecord> GetOptimizationHistory();
-    ReprojectionErrorMonitor::AdaptiveParams GetAdaptiveParams();
+    // (Adaptive strategy was removed; APIs intentionally not exposed)
+
+    // Allow dataset switching from examples
+    void ChangeDataset();
 
 private:
     // Trigger fast pose optimization
@@ -199,7 +199,7 @@ private:
     bool isLost();
     bool isFinished();
 
-    void ChangeDataset();
+    // moved to public
 
     //void SaveAtlas(int type);
 

@@ -1354,7 +1354,11 @@ void System::TriggerFastPoseOptimization()
     record.duration = result.duration;
     record.involvedKFs = result.optimizedKFs;
     
-    mpReprojectionErrorMonitor->RecordOptimizationResult(record);
+    // Previously we recorded optimization results for an adaptive strategy.
+    // That behavior was removed to avoid runtime overhead. Keep this as a no-op.
+    if (mpReprojectionErrorMonitor) {
+        mpReprojectionErrorMonitor->RecordOptimizationResult(record);
+    }
     
     if (result.converged && result.improvement > 0.01) {
         cout << "Fast pose optimization succeeded. Error improved: " 
@@ -1376,31 +1380,25 @@ void System::UpdateKeyFramePoses(const vector<KeyFrame*>& vpKeyFrames)
 
 void System::EnableAdaptiveOptimization(bool enable)
 {
-    if (mpReprojectionErrorMonitor) {
-        mpReprojectionErrorMonitor->EnableAdaptiveAdjustment(enable);
-    }
+    // Adaptive optimization was removed; function retained as a compatibility stub.
+    (void)enable;
 }
 
 std::vector<ReprojectionErrorMonitor::OptimizationRecord> System::GetOptimizationHistory()
 {
-    if (mpReprojectionErrorMonitor) {
-        return mpReprojectionErrorMonitor->GetOptimizationHistory();
-    }
+    // Optimization history feature removed; return empty list for compatibility.
     return std::vector<ReprojectionErrorMonitor::OptimizationRecord>();
 }
 
 ReprojectionErrorMonitor::AdaptiveParams System::GetAdaptiveParams()
 {
-    if (mpReprojectionErrorMonitor) {
-        return mpReprojectionErrorMonitor->GetAdaptiveParams();
-    }
-    
-    ReprojectionErrorMonitor::AdaptiveParams defaultParams;
-    defaultParams.errorThreshold = 2.0;
-    defaultParams.changeRateThreshold = 0.5;
-    defaultParams.durationThreshold = 1.0;
-    defaultParams.maxIterations = 3;
-    return defaultParams;
+    // Adaptive parameters were removed; return a small default structure for compatibility.
+    ReprojectionErrorMonitor::AdaptiveParams p;
+    p.errorThreshold = 2.0;
+    p.changeRateThreshold = 0.5;
+    p.durationThreshold = 1.0;
+    p.maxIterations = 1;
+    return p;
 }
 
 } //namespace ORB_SLAM

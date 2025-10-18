@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor
+CMAKE_SOURCE_DIR = /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build
+CMAKE_BINARY_DIR = /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build
 
 # Utility rule file for linedesc_includes.
 
@@ -84,6 +84,6 @@ CMakeFiles/linedesc_includes.dir/clean:
 .PHONY : CMakeFiles/linedesc_includes.dir/clean
 
 CMakeFiles/linedesc_includes.dir/depend:
-	cd /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build /home/mirra/桌面/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build/CMakeFiles/linedesc_includes.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build /mnt/hgfs/REFIX/ORB_SLAM3_LINE/Thirdparty/line_descriptor/build/CMakeFiles/linedesc_includes.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/linedesc_includes.dir/depend
 

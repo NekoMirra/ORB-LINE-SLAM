@@ -48,8 +48,6 @@ ReprojectionErrorMonitor::ReprojectionErrorMonitor(Map* pMap,
     , mDurationThreshold(durationThreshold)
     , mbIsAbnormal(false)
     , mpOptimizer(nullptr)
-    , mMaxHistorySize(100)
-    , mbEnableAdaptiveAdjustment(true)
 {
     // 初始化误差统计信息
     mErrorStats.currentError = 0.0;
@@ -59,12 +57,6 @@ ReprojectionErrorMonitor::ReprojectionErrorMonitor(Map* pMap,
     mErrorStats.minError = std::numeric_limits<double>::max();
     mErrorStats.errorCount = 0;
     mErrorStats.lastUpdateTime = 0.0;
-    
-    // 初始化自适应参数
-    mAdaptiveParams.errorThreshold = errorThreshold;
-    mAdaptiveParams.changeRateThreshold = changeRateThreshold;
-    mAdaptiveParams.durationThreshold = durationThreshold;
-    mAdaptiveParams.maxIterations = 3;
     
     mLastUpdateTime = std::chrono::steady_clock::now();
     mAbnormalStartTime = mLastUpdateTime;
@@ -142,13 +134,14 @@ double ReprojectionErrorMonitor::ComputeReprojectionError(Frame* pFrame)
     }
     
     // 计算线的重投影误差（如果有的话）
-    for (int i = 0; i < pFrame->Nlines; i++) {
+    for (int i = 0; i < pFrame->N_l; i++) {
         MapLine* pML = pFrame->mvpMapLines[i];
         if (pML) {
             if (pML->Observations() > 0) {
-                // 获取3D线坐标
-                cv::Mat p3D_start = pML->GetWorldPosStart();
-                cv::Mat p3D_end = pML->GetWorldPosEnd();
+                // 获取3D线坐标（起点与终点），由 Vector6d [sx,sy,sz, ex,ey,ez] 组成
+                Vector6d pos6 = pML->GetWorldPos();
+                //Eigen::Vector3d sP = pos6.head<3>();
+                //Eigen::Vector3d eP = pos6.tail<3>();
                 
                 // 计算线的重投影误差（简化处理）
                 double error = 0.0;
@@ -297,77 +290,15 @@ void ReprojectionErrorMonitor::ComputeWindowStatistics()
     mErrorStats.lastUpdateTime = duration.count() / 1000.0;
 }
 
-void ReprojectionErrorMonitor::EnableAdaptiveAdjustment(bool enable)
-{
-    std::lock_guard<std::mutex> lock(mMutex);
-    mbEnableAdaptiveAdjustment = enable;
-}
-
-std::vector<ReprojectionErrorMonitor::OptimizationRecord> ReprojectionErrorMonitor::GetOptimizationHistory() const
-{
-    std::lock_guard<std::mutex> lock(mMutex);
-    return std::vector<OptimizationRecord>(mvOptimizationHistory.begin(), mvOptimizationHistory.end());
-}
-
-ReprojectionErrorMonitor::AdaptiveParams ReprojectionErrorMonitor::GetAdaptiveParams() const
-{
-    std::lock_guard<std::mutex> lock(mMutex);
-    return mAdaptiveParams;
-}
-
-void ReprojectionErrorMonitor::RecordOptimizationResult(const OptimizationRecord& record)
-{
-    std::lock_guard<std::mutex> lock(mMutex);
-    
-    mvOptimizationHistory.push_back(record);
-    
-    // 保持历史记录大小限制
-    while (mvOptimizationHistory.size() > mMaxHistorySize) {
-        mvOptimizationHistory.pop_front();
-    }
-    
-    // 自适应调整参数
-    if (mbEnableAdaptiveAdjustment) {
-        AdjustParametersAdaptively();
-    }
-}
+// Note: compatibility APIs related to the deprecated adaptive strategy
+// (optimization history, adaptive params and explicit recording) were
+// removed from the header. No-op implementations were present before,
+// and are omitted now to keep the implementation consistent with the
+// current public API in ReprojectionErrorMonitor.h.
 
 void ReprojectionErrorMonitor::AdjustParametersAdaptively()
 {
-    if (mvOptimizationHistory.size() < 5) {
-        return; // 需要足够的历史数据
-    }
-    
-    // 计算最近优化的成功率
-    int recentOptimizations = std::min(10, (int)mvOptimizationHistory.size());
-    int successfulOptimizations = 0;
-    double totalImprovement = 0.0;
-    
-    for (int i = mvOptimizationHistory.size() - recentOptimizations; i < mvOptimizationHistory.size(); i++) {
-        const auto& record = mvOptimizationHistory[i];
-        if (record.converged && record.improvement > 0.1) {
-            successfulOptimizations++;
-            totalImprovement += record.improvement;
-        }
-    }
-    
-    double successRate = (double)successfulOptimizations / recentOptimizations;
-    double avgImprovement = totalImprovement / std::max(1, successfulOptimizations);
-    
-    // 根据成功率调整参数
-    if (successRate < 0.3) {
-        // 成功率低，放宽触发条件
-        mAdaptiveParams.errorThreshold *= 1.1;
-        mAdaptiveParams.durationThreshold *= 1.2;
-    } else if (successRate > 0.8 && avgImprovement > 0.5) {
-        // 成功率高且改善明显，可以更积极地触发优化
-        mAdaptiveParams.errorThreshold *= 0.95;
-        mAdaptiveParams.durationThreshold *= 0.9;
-    }
-    
-    // 限制参数范围
-    mAdaptiveParams.errorThreshold = std::max(1.0, std::min(5.0, mAdaptiveParams.errorThreshold));
-    mAdaptiveParams.durationThreshold = std::max(0.5, std::min(3.0, mAdaptiveParams.durationThreshold));
+    // Adaptive adjustment implementation removed.
 }
 
 bool ReprojectionErrorMonitor::ValidateOptimizationResult(double preError, double postError, 

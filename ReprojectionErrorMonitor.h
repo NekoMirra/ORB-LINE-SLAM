@@ -47,6 +47,20 @@ class ReprojectionErrorMonitor
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
+    // 优化历史记录结构（公开）
+    struct OptimizationRecord {
+        double timestamp;
+        double preError;
+        double postError;
+        double improvement;
+        bool converged;
+        int iterations;
+        double duration;
+        std::vector<KeyFrame*> involvedKFs;
+    };
+
+    // (Adaptive strategy removed) — only OptimizationRecord and ErrorStats remain
+
     /**
      * @brief 构造函数
      * @param pMap 地图指针
@@ -118,29 +132,7 @@ public:
     void SetParameters(size_t windowSize, double errorThreshold, 
                       double changeRateThreshold, double durationThreshold);
 
-    /**
-     * @brief 启用/禁用自适应参数调整
-     * @param enable 是否启用自适应调整
-     */
-    void EnableAdaptiveAdjustment(bool enable);
-
-    /**
-     * @brief 获取优化历史记录
-     * @return 优化历史记录列表
-     */
-    std::vector<OptimizationRecord> GetOptimizationHistory() const;
-
-    /**
-     * @brief 获取自适应参数
-     * @return 当前自适应参数
-     */
-    AdaptiveParams GetAdaptiveParams() const;
-
-    /**
-     * @brief 记录优化结果
-     * @param record 优化记录
-     */
-    void RecordOptimizationResult(const OptimizationRecord& record);
+    // Note: adaptive adjustment, optimization history and parameter APIs removed.
 
 private:
     /**
@@ -217,31 +209,7 @@ private:
     // 上次更新时间
     std::chrono::steady_clock::time_point mLastUpdateTime;
 
-    // 优化历史记录
-    struct OptimizationRecord {
-        double timestamp;
-        double preError;
-        double postError;
-        double improvement;
-        bool converged;
-        int iterations;
-        double duration;
-        std::vector<KeyFrame*> involvedKFs;
-    };
-    
-    std::deque<OptimizationRecord> mvOptimizationHistory;
-    size_t mMaxHistorySize;
-    
-    // 自适应参数调整
-    struct AdaptiveParams {
-        double errorThreshold;
-        double changeRateThreshold;
-        double durationThreshold;
-        int maxIterations;
-    };
-    
-    AdaptiveParams mAdaptiveParams;
-    bool mbEnableAdaptiveAdjustment;
+    // (Removed) optimization history and adaptive-parameter members
 };
 
 } // namespace ORB_SLAM3
