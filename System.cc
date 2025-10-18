@@ -205,11 +205,18 @@ System::System(const string &strVocFile_ORB, const string &strVocFile_Line, cons
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 
-    // Initialize reprojection error monitor
-    // 初始化重投影误差监控器
+    // Initialize reprojection error monitor with optimized parameters
+    // 初始化重投影误差监控器(使用优化的参数)
     Map* pCurrentMap = mpAtlas->GetCurrentMap();
     if(pCurrentMap) {
-        mpReprojectionErrorMonitor = new ReprojectionErrorMonitor(pCurrentMap);
+        // 使用更宽松的阈值以减少优化频率,提高性能
+        mpReprojectionErrorMonitor = new ReprojectionErrorMonitor(
+            pCurrentMap,
+            20,      // windowSize: 滑动窗口大小
+            5.0,     // errorThreshold: 误差阈值(从2.0提高到5.0)
+            1.0,     // changeRateThreshold: 变化率阈值(从0.5提高到1.0)
+            2.0      // durationThreshold: 持续时间阈值(从1.0提高到2.0秒)
+        );
     } else {
         mpReprojectionErrorMonitor = nullptr;
     }
@@ -395,14 +402,9 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 
-    // Initialize reprojection error monitor
-    // 初始化重投影误差监控器
-    Map* pCurrentMap = mpAtlas->GetCurrentMap();
-    if(pCurrentMap) {
-        mpReprojectionErrorMonitor = new ReprojectionErrorMonitor(pCurrentMap);
-    } else {
-        mpReprojectionErrorMonitor = nullptr;
-    }
+    // PERFORMANCE: Reprojection error monitor completely disabled for maximum speed
+    // 性能优化: 完全禁用重投影误差监控器以获得最大速度  
+    mpReprojectionErrorMonitor = nullptr;
 
     // Fix verbosity
     Verbose::SetTh(Verbose::VERBOSITY_QUIET);
@@ -1328,18 +1330,18 @@ void System::TriggerFastPoseOptimization()
         return;
     }
     
-    // 限制优化范围以提高效率（选择最近的关键帧）
-    if (vpKeyFrames.size() > 20) {
-        // 按时间戳排序，选择最近的20个关键帧
+    // 限制优化范围以提高效率（选择最近的10个关键帧以加速）
+    if (vpKeyFrames.size() > 10) {
+        // 按时间戳排序，选择最近的10个关键帧
         std::sort(vpKeyFrames.begin(), vpKeyFrames.end(),
                  [](KeyFrame* a, KeyFrame* b) { return a->mTimeStamp > b->mTimeStamp; });
-        vpKeyFrames.resize(20);
+        vpKeyFrames.resize(10);
     }
     
-    // 使用增强的优化方法
+    // 使用增强的优化方法(减少迭代次数以加速)
     auto startTime = std::chrono::steady_clock::now();
     Optimizer::OptimizationResult result = Optimizer::FastPoseOptimizationWithValidation(
-        vpKeyFrames, vpMapPoints, vpMapLines, 5, 1e-6);
+        vpKeyFrames, vpMapPoints, vpMapLines, 3, 1e-5);  // 迭代次数从5减到3,容差从1e-6放宽到1e-5
     auto endTime = std::chrono::steady_clock::now();
     
     // 记录优化结果
@@ -1360,12 +1362,14 @@ void System::TriggerFastPoseOptimization()
         mpReprojectionErrorMonitor->RecordOptimizationResult(record);
     }
     
+    // 优化: 移除频繁的cout输出以提高性能
+    // 仅在DEBUG模式下输出
+    #ifdef DEBUG_OPTIMIZATION
     if (result.converged && result.improvement > 0.01) {
         cout << "Fast pose optimization succeeded. Error improved: " 
              << result.improvement * 100 << "%, Duration: " << result.duration << "ms" << endl;
-    } else {
-        cout << "Fast pose optimization had limited improvement or failed to converge." << endl;
     }
+    #endif
 }
 
 void System::UpdateKeyFramePoses(const vector<KeyFrame*>& vpKeyFrames)

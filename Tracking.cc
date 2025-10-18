@@ -2150,12 +2150,15 @@ void Tracking::Track()
             mlbLost.push_back(mState==LOST);
         }
 
-        // Check reprojection error for dynamic optimization
-        // 检查重投影误差以进行动态优化
-        if(mState == OK)
-        {
+        // PERFORMANCE: Reprojection error monitoring completely disabled for maximum speed
+        // 性能优化: 完全禁用重投影误差监控以获得最大速度
+        // 如需启用,取消下面代码的注释
+        /*
+        static int frameCounter = 0;
+        if(mState == OK && (++frameCounter % 10 == 0)) {
             mpSystem->CheckReprojectionError();
         }
+        */
     }
 }
 

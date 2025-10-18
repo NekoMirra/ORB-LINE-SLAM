@@ -104,56 +104,43 @@ double ReprojectionErrorMonitor::ComputeReprojectionError(Frame* pFrame)
     double totalError = 0.0;
     int validPoints = 0;
     
+    // 优化: 只计算前100个点的重投影误差以加速
+    int maxPoints = std::min(pFrame->N, 100);
+    
     // 计算点的重投影误差
-    for (int i = 0; i < pFrame->N; i++) {
+    for (int i = 0; i < maxPoints; i++) {
         MapPoint* pMP = pFrame->mvpMapPoints[i];
-        if (pMP) {
-            if (pMP->Observations() > 0) {
-                // 获取3D点坐标
-                cv::Mat p3D = pMP->GetWorldPos();
-                
-                // 获取观测点
-                cv::Point2f observed = pFrame->mvKeysUn[i].pt;
-                
-                // 计算重投影误差
-                cv::Mat p3D_cam = pFrame->mTcw * p3D;
-                if (p3D_cam.at<float>(2) > 0) {  // 点在相机前方
-                    // 计算重投影点
-                    float x = p3D_cam.at<float>(0) / p3D_cam.at<float>(2);
-                    float y = p3D_cam.at<float>(1) / p3D_cam.at<float>(2);
-                    
-                    // 计算重投影误差
-                    float dx = observed.x - x;
-                    float dy = observed.y - y;
-                    double error = sqrt(dx*dx + dy*dy);
-                    totalError += error;
-                    validPoints++;
-                }
-            }
+        if (!pMP || pMP->Observations() <= 0) continue;
+        
+        // 获取3D点坐标
+        cv::Mat p3D = pMP->GetWorldPos();
+        if(p3D.empty()) continue;
+        
+        // 获取观测点
+        cv::Point2f observed = pFrame->mvKeysUn[i].pt;
+        
+        // 计算重投影误差
+        cv::Mat p3D_cam = pFrame->mTcw * p3D;
+        float depth = p3D_cam.at<float>(2);
+        if (depth > 0.1f && depth < 100.0f) {  // 点在合理深度范围内
+            // 计算重投影点
+            float invDepth = 1.0f / depth;
+            float x = p3D_cam.at<float>(0) * invDepth;
+            float y = p3D_cam.at<float>(1) * invDepth;
+            
+            // 计算重投影误差
+            float dx = observed.x - x;
+            float dy = observed.y - y;
+            totalError += (dx*dx + dy*dy);  // 避免sqrt以加速
+            validPoints++;
         }
     }
     
-    // 计算线的重投影误差（如果有的话）
-    for (int i = 0; i < pFrame->N_l; i++) {
-        MapLine* pML = pFrame->mvpMapLines[i];
-        if (pML) {
-            if (pML->Observations() > 0) {
-                // 获取3D线坐标（起点与终点），由 Vector6d [sx,sy,sz, ex,ey,ez] 组成
-                Vector6d pos6 = pML->GetWorldPos();
-                //Eigen::Vector3d sP = pos6.head<3>();
-                //Eigen::Vector3d eP = pos6.tail<3>();
-                
-                // 计算线的重投影误差（简化处理）
-                double error = 0.0;
-                // 这里可以添加更复杂的线重投影误差计算
-                totalError += error;
-                validPoints++;
-            }
-        }
-    }
+    // 优化: 跳过线的重投影误差计算以提高性能
+    // 线特征的误差计算较复杂且对整体误差影响相对较小
     
     if (validPoints > 0) {
-        return totalError / validPoints;
+        return sqrt(totalError / validPoints);  // 返回RMS误差
     }
     
     return 0.0;
